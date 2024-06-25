@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "ES2021",
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"useDefineForClassFields": true,
+		"allowJs": false,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"module": "CommonJS",
+		"moduleResolution": "Node",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"typeRoots": ["./node_modules/@types", "./src/types"]
+	},
+	"include": ["./src/**/*"],
+	"exclude": ["node_modules", "dist"]
+}

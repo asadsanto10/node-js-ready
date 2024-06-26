@@ -4,25 +4,28 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 
 const { combine, timestamp, label, printf } = format;
 
-const myFormat = printf(({ level, message, label: formateLable, timestamp: formateTimeStamp }) => {
-	const date = new Date(formateTimeStamp as number);
-	const hour = date.getHours();
-	const minute = date.getMinutes();
-	const second = date.getSeconds();
-	const makeLog = {
-		label: formateLable,
-		level,
-		message,
-		timestamp: `${date.toDateString()} ${hour}:${minute}:${second}`,
-	};
+const myFormat = printf(
+	({ level, message, label: formateLable, timestamp: formateTimeStamp, ...rest }) => {
+		const date = new Date(formateTimeStamp as number);
+		const hour = date.getHours();
+		const minute = date.getMinutes();
+		const second = date.getSeconds();
+		const makeLog = {
+			label: formateLable,
+			level,
+			message,
+			...rest,
+			timestamp: `${date.toDateString()} ${hour}:${minute}:${second}`,
+		};
 
-	// return `${date.toDateString()} ${hour}:${minute}:${second} [${formateLable}] ${level}: ${message}`;
-	return JSON.stringify(makeLog);
-});
+		// return `${date.toDateString()} ${hour}:${minute}:${second} [${formateLable}] ${level}: ${message}`;
+		return JSON.stringify(makeLog);
+	}
+);
 
 export const logger = winston.createLogger({
 	level: 'info',
-	format: combine(label({ label: 'UNI-API' }), timestamp(), myFormat),
+	format: combine(label({ label: 'API' }), timestamp(), myFormat),
 	transports: [
 		new winston.transports.Console(),
 		new DailyRotateFile({

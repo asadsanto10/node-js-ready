@@ -1,3 +1,4 @@
 !.*.js
 **/dist/**
 **/coverage/**
+**/src/grpc/proto/**

@@ -19,5 +19,8 @@
 		"source.fixAll.eslint": "explicit",
 		"source.organizeImports": "explicit"
 	},
-	"eslint.alwaysShowStatus": true
+	"eslint.alwaysShowStatus": true,
+	"[proto3]": {
+		"editor.formatOnSave": true
+	}
 }

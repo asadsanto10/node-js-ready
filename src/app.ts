@@ -11,6 +11,7 @@ import { Server } from 'http';
 import globalErrorHandler from './app/middlewares/globalError/globalErrorHandler.middleware';
 import router from './app/routes/router';
 
+import { grpcServer } from './grpc/grpc-server';
 import { sigTerm, uncaughtException, unhandledRejection } from './rejectionHandel/rejectionHandel';
 import { logger } from './shared/logger';
 
@@ -45,6 +46,7 @@ app.use(globalErrorHandler);
 server = app.listen(port, () => {
 	logger.info(`Listening on port ${port}`);
 });
+grpcServer();
 
 // unhandled rejection
 unhandledRejection(server);

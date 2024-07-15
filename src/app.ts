@@ -2,8 +2,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
+import amqp from 'amqplib';
 import cors from 'cors';
-
 import express, { Application } from 'express';
 
 import cookieParser from 'cookie-parser';
@@ -37,6 +37,41 @@ app.use(express.urlencoded({ extended: true }));
 // route
 const base = '/api/v1';
 app.use(base, router);
+
+const queue = 'product_inventory';
+const text = {
+	item_id: 'macbook',
+	text: 'This is a sample message to send receiver to check the ordered Item Availablility',
+};
+
+setTimeout(() => {
+	(async () => {
+		try {
+			const connection = await amqp.connect('amqp://localhost');
+			const channel = await connection.createChannel();
+
+			process.once('SIGINT', async () => {
+				await channel.close();
+				await connection.close();
+			});
+
+			await channel.assertQueue(queue, { durable: false });
+			await channel.consume(
+				queue,
+				(message) => {
+					if (message) {
+						console.log(" [x] Received '%s'", JSON.parse(message.content.toString()));
+					}
+				},
+				{ noAck: true }
+			);
+
+			console.log(' [*] Waiting for messages. To exit press CTRL+C');
+		} catch (err) {
+			console.warn(err);
+		}
+	})();
+}, 5000);
 
 // global error
 app.use(globalErrorHandler);

@@ -1,10 +1,12 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import amqp from 'amqplib';
+import cluster from 'cluster';
 import cors from 'cors';
 import express, { Application } from 'express';
+import os from 'os';
 
 import cookieParser from 'cookie-parser';
 import { Server } from 'http';
@@ -38,53 +40,38 @@ app.use(express.urlencoded({ extended: true }));
 const base = '/api/v1';
 app.use(base, router);
 
-const queue = 'product_inventory';
-const text = {
-	item_id: 'macbook',
-	text: 'This is a sample message to send receiver to check the ordered Item Availablility',
-};
-
-setTimeout(() => {
-	(async () => {
-		try {
-			const connection = await amqp.connect('amqp://localhost');
-			const channel = await connection.createChannel();
-
-			process.once('SIGINT', async () => {
-				await channel.close();
-				await connection.close();
-			});
-
-			await channel.assertQueue(queue, { durable: false });
-			await channel.consume(
-				queue,
-				(message) => {
-					if (message) {
-						console.log(" [x] Received '%s'", JSON.parse(message.content.toString()));
-					}
-				},
-				{ noAck: true }
-			);
-
-			console.log(' [*] Waiting for messages. To exit press CTRL+C');
-		} catch (err) {
-			console.warn(err);
-		}
-	})();
-}, 5000);
-
-// global error
-app.use(globalErrorHandler);
-
-// eslint-disable-next-line prefer-const
-server = app.listen(port, () => {
-	logger.info(`Listening on port ${port}`);
+// ?? cluster
+const numberOfCpu = os.cpus().length;
+app.get('/cluster', (req, res) => {
+	// console.log(numberOfCpu);
+	// eslint-disable-next-line no-plusplus
+	for (let i = 0; i < 1e8; i++) {}
+	res.send({ message: `Cluster is running and pid is: ${process.pid}` });
+	// cluster.worker?.kill();
 });
 
-// unhandled rejection
-unhandledRejection(server);
+if (cluster.isPrimary) {
+	for (let i = 0; i < numberOfCpu; i++) {
+		cluster.fork();
+	}
 
-// sigTerm detection
-sigTerm(server);
+	cluster.on('exit', (worker, code, signal) => {
+		console.log(`worker ${worker.process.pid} died`);
+		cluster.fork();
+	});
+} else {
+	// global error
+	app.use(globalErrorHandler);
 
+	// eslint-disable-next-line prefer-const
+	server = app.listen(port, () => {
+		logger.info(`Listening on port ${port} ans server ${process.pid}`);
+	});
+
+	// unhandled rejection
+	unhandledRejection(server);
+
+	// sigTerm detection
+	sigTerm(server);
+}
 export default app;

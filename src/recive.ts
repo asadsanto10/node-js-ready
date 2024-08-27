@@ -11,6 +11,9 @@ export const consumeQueue = async () => {
 		await channel.assertQueue('test-queue');
 
 		channel.consume('test-queue', (data) => {
+			if (!data) {
+				return console.error(`Invalid incoming message`);
+			}
 			console.log(`${Buffer.from(data.content)}`);
 			channel.ack(data);
 		});

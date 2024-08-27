@@ -10,8 +10,8 @@ import { Server } from 'http';
 import globalErrorHandler from './app/middlewares/globalError/globalErrorHandler.middleware';
 import router from './app/routes/router';
 
-import { connectQueue, sendData } from './rabbitMQ/initMQ';
-import { consumeQueue } from './recive';
+import { consumer1 } from './rabbitMQ/consumer';
+import { consumer2 } from './rabbitMQ/consumer2';
 import { uncaughtException, unhandledRejection } from './rejectionHandel/rejectionHandel';
 import { logger } from './shared/logger';
 
@@ -76,16 +76,18 @@ const text = {
 
 // global error
 app.use(globalErrorHandler);
-connectQueue();
-setTimeout(() => {
-	sendData({
-		name: 'aasdad',
-		age: 25,
-		city: 'Los Angeles',
-	});
-}, 1000);
+// connectQueue();
+// setTimeout(() => {
+// 	sendData({
+// 		name: 'aasdad',
+// 		age: 25,
+// 		city: 'Los Angeles',
+// 	});
+// }, 1000);
 
-consumeQueue();
+// consumeQueue();
+consumer1();
+consumer2();
 
 // eslint-disable-next-line prefer-const
 server = app.listen(port, () => {

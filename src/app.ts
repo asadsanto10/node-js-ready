@@ -10,8 +10,8 @@ import { Server } from 'http';
 import globalErrorHandler from './app/middlewares/globalError/globalErrorHandler.middleware';
 import router from './app/routes/router';
 
-import { consumer1 } from './rabbitMQ/consumer';
-import { consumer2 } from './rabbitMQ/consumer2';
+import { topiOrderConsumer } from './rabbitMQ/topicOrder';
+import { topiPaymentConsumer } from './rabbitMQ/topicpayment';
 import { uncaughtException, unhandledRejection } from './rejectionHandel/rejectionHandel';
 import { logger } from './shared/logger';
 
@@ -86,8 +86,11 @@ app.use(globalErrorHandler);
 // }, 1000);
 
 // consumeQueue();
-consumer1();
-consumer2();
+// consumer1();
+// consumer2();
+
+topiOrderConsumer();
+topiPaymentConsumer();
 
 // eslint-disable-next-line prefer-const
 server = app.listen(port, () => {

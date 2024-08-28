@@ -1,5 +1,5 @@
 import * as amqp from 'amqplib';
-import { logger } from '../shared/logger';
+import { logger } from '../../shared/logger';
 
 const queueName = 'order-queue';
 const exchange = 'notifiction-exchange';
@@ -10,8 +10,8 @@ export const topiOrderConsumer = async () => {
 		const channel = await connection.createChannel();
 
 		await channel.assertExchange(exchange, 'topic', { durable: true });
-		await channel.assertQueue(queueName, { durable: true });
-		await channel.bindQueue(queueName, exchange, 'order.*');
+		const q = await channel.assertQueue(queueName, { durable: true });
+		await channel.bindQueue(q.queue, exchange, 'order.*');
 
 		logger.info({
 			message: 'waiting for order data',

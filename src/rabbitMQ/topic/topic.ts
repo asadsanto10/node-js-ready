@@ -1,5 +1,5 @@
 import * as amqp from 'amqplib';
-import { logger } from '../shared/logger';
+import { logger } from '../../shared/logger';
 
 const exchange = 'notifiction-exchange';
 const routingKey = 'order.place';

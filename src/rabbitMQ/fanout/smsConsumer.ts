@@ -24,7 +24,7 @@ export const smsConsumer = async () => {
 			// console.log(msg.content?.toString());
 			logger.info({
 				message: 'sms consumer :: data recived successfully from ::' + q.queue,
-				data: JSON.parse(msg.content?.toString()),
+				data: msg.content?.toString(),
 			});
 			channel.ack(msg);
 		});

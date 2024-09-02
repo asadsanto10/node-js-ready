@@ -11,11 +11,11 @@ import cookieParser from 'cookie-parser';
 import http from 'http';
 import globalErrorHandler from './app/middlewares/globalError/globalErrorHandler.middleware';
 import router from './app/routes/router';
-
 import { grpcServer } from './grpc/grpc-server';
+import './redis/initRedis';
+import { redisOperations } from './redis/redis-operation';
 import { uncaughtException, unhandledRejection } from './rejectionHandel/rejectionHandel';
 import { logger } from './shared/logger';
-import { initSocket } from './socketio/initSocket';
 
 // let server: Server;
 
@@ -156,9 +156,11 @@ app.use(base, router);
 app.use(globalErrorHandler);
 
 const server = http.createServer(app);
-initSocket(server);
+// initSocket(server);
 
 grpcServer();
+// reds operation
+redisOperations();
 
 // eslint-disable-next-line prefer-const
 server.listen(port, () => {

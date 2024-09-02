@@ -8,21 +8,20 @@ import cors from 'cors';
 import express, { Application } from 'express';
 
 import cookieParser from 'cookie-parser';
-import { Server } from 'http';
+import http from 'http';
 import globalErrorHandler from './app/middlewares/globalError/globalErrorHandler.middleware';
 import router from './app/routes/router';
 
 import { grpcServer } from './grpc/grpc-server';
-import { sigTerm, uncaughtException, unhandledRejection } from './rejectionHandel/rejectionHandel';
+import { uncaughtException, unhandledRejection } from './rejectionHandel/rejectionHandel';
 import { logger } from './shared/logger';
+import { initSocket } from './socketio/initSocket';
 
-let server: Server;
+// let server: Server;
 
 const app: Application = express();
 // server port
-const port: number | string = process.env.PORT || 5005;
-
-uncaughtException();
+const port: number | string = process.env.PORT || 50005;
 
 // parser
 app.use(cors());
@@ -156,16 +155,20 @@ app.use(base, router);
 // global error
 app.use(globalErrorHandler);
 
-// eslint-disable-next-line prefer-const
-server = app.listen(port, () => {
-	logger.info(`Listening on port ${port}`);
-});
+const server = http.createServer(app);
+initSocket(server);
+
 grpcServer();
 
+// eslint-disable-next-line prefer-const
+server.listen(port, () => {
+	logger.info(`Listening on port ${port}`);
+});
+uncaughtException();
 // unhandled rejection
 unhandledRejection(server);
 
 // sigTerm detection
-sigTerm(server);
+// sigTerm(server);
 
 export default app;

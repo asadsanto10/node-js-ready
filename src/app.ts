@@ -11,11 +11,17 @@ import cookieParser from 'cookie-parser';
 import http from 'http';
 import globalErrorHandler from './app/middlewares/globalError/globalErrorHandler.middleware';
 import router from './app/routes/router';
-import { grpcServer } from './grpc/grpc-server';
-import './redis/initRedis';
-import { redisOperations } from './redis/redis-operation';
+// import './redis/initRedis';
 import { uncaughtException, unhandledRejection } from './rejectionHandel/rejectionHandel';
 import { logger } from './shared/logger';
+
+import apm from 'elastic-apm-node';
+apm.start({
+	serviceName: 'testService',
+	serverUrl: 'http://localhost:8200',
+	environment: 'development',
+	captureBody: 'all',
+});
 
 // let server: Server;
 
@@ -29,6 +35,7 @@ app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 // app.use(
 // 	fileUpload({
 // 		limits: { fileSize: 50 * 1024 * 1024 },
@@ -152,15 +159,28 @@ app.get('/rider', (req, res) => {
 });
 app.use(base, router);
 
+app.get('/users', (req, res) => {
+	const trans = apm.startTransaction('GET /users route');
+
+	let count = 0;
+
+	for (let index = 0; index < 999999999; index++) {
+		count += 1;
+	}
+
+	res.json({ count });
+	trans.end();
+});
+
 // global error
 app.use(globalErrorHandler);
 
 const server = http.createServer(app);
 // initSocket(server);
 
-grpcServer();
+// grpcServer();
 // reds operation
-redisOperations();
+// redisOperations();
 
 // eslint-disable-next-line prefer-const
 server.listen(port, () => {

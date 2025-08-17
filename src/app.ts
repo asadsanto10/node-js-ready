@@ -1,17 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 import cors from 'cors';
 import express, { Application } from 'express';
 
 import cookieParser from 'cookie-parser';
 import { Server } from 'http';
-import globalErrorHandler from './app/middlewares/globalError/globalErrorHandler.middleware';
 import router from './app/routes/router';
 
-import { pushConsumer } from './rabbitMQ/fanout/pushConsumer';
-import { smsConsumer } from './rabbitMQ/fanout/smsConsumer';
+import { connectMqttClient } from './mqtt/mqttClient';
 import { uncaughtException, unhandledRejection } from './rejectionHandel/rejectionHandel';
 import { logger } from './shared/logger';
 
@@ -38,72 +32,12 @@ app.use(express.urlencoded({ extended: true }));
 // route
 const base = '/api/v1';
 app.use(base, router);
+connectMqttClient();
 
-const queue = 'product_inventory';
-const text = {
-	item_id: 'macbook',
-	text: 'This is a sample message to send receiver to check the ordered Item Availablility',
-};
-
-// setTimeout(() => {
-// 	(async () => {
-// 		try {
-// 			const connection = await amqp.connect('amqp://localhost');
-// 			const channel = await connection.createChannel();
-
-// 			process.once('SIGINT', async () => {
-// 				await channel.close();
-// 				await connection.close();
-// 			});
-
-// 			await channel.assertQueue(queue, { durable: false });
-// 			await channel.consume(
-// 				queue,
-// 				(message) => {
-// 					if (message) {
-// 						console.log(" [x] Received '%s'", JSON.parse(message.content.toString()));
-// 					}
-// 				},
-// 				{ noAck: true }
-// 			);
-
-// 			console.log(' [*] Waiting for messages. To exit press CTRL+C');
-// 		} catch (err) {
-// 			console.warn(err);
-// 		}
-// 	})();
-// }, 5000);
-
-// global error
-app.use(globalErrorHandler);
-// connectQueue();
-// setTimeout(() => {
-// 	sendData({
-// 		name: 'aasdad',
-// 		age: 25,
-// 		city: 'Los Angeles',
-// 	});
-// }, 1000);
-
-// consumeQueue();
-// consumer1();
-// consumer2();
-
-// topiOrderConsumer();
-// topiPaymentConsumer();
-
-smsConsumer();
-pushConsumer();
-
-// eslint-disable-next-line prefer-const
 server = app.listen(port, () => {
 	logger.info(`Listening on port ${port}`);
 });
 
-// unhandled rejection
 unhandledRejection(server);
-
-// sigTerm detection
-// sigTerm(server);
 
 export default app;

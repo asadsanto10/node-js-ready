@@ -50,6 +50,63 @@ router.get('/rmq', async (req: Request, res: Response) => {
 	res.json({ message: 'okkk' });
 });
 
+router.post('/mqtt/auth', async (req: Request, res: Response) => {
+	console.log(req.body);
+
+	// res.status(200).json({ body: req.body });
+	res.status(200).json(
+		// {
+		// 	result: 'allow',
+		// 	is_superuser: false,
+		// 	acl: [
+		// 		{
+		// 			permission: 'allow',
+		// 			action: 'publish',
+		// 			topic: 'test-topic',
+		// 		},
+		// 		// {
+		// 		// 	action: 'subscribe',
+		// 		// 	topic: 'devices/${clientid}/#',
+		// 		// },
+		// 	],
+		// 	// acl: [
+		// 	// 	{ permission: 'allow', action: 'publish', topic: 'test-topic' },
+		// 	// { permission: 'allow', action: 'subscribe', topic: 'commands/#' },
+		// 	// ],
+		// }
+
+		{
+			result: 'allow', // "allow" | "deny" | "ignore"
+			is_superuser: false, // options: true | false, default value: false
+			// client_attrs: {
+			// 	// optional (since v5.7.0)
+			// 	role: 'admin',
+			// 	sn: '10c61f1a1f47',
+			// },
+			// expire_at: 1654254601, // optional (since v5.8.0)
+			// optional (since v5.8.0)
+			acl: [
+				{
+					permission: 'allow',
+					action: 'subscribe',
+					topic: 'test-topic',
+				},
+				// {
+				// 	permission: 'deny',
+				// 	action: 'publish',
+				// 	topic: 'test-topic',
+				// },
+				// {
+				// 	permission: 'deny',
+				// 	action: 'all',
+				// 	topic: 't/3',
+				// },
+			],
+		}
+	);
+	// res.status(200).json({ result: 'deny' });
+});
+
 // not found route
 router.use((req: Request, res: Response, next: NextFunction) => {
 	res.status(httpStatus.NOT_FOUND).json({

@@ -23,7 +23,7 @@ const myFormat = printf(
 
 export const logger = winston.createLogger({
 	level: 'info',
-	format: combine(label({ label: 'UNI-API' }), timestamp(), myFormat),
+	format: combine(label({ label: 'test-node' }), timestamp(), myFormat),
 	transports: [
 		new winston.transports.Console(),
 		// new DailyRotateFile({
@@ -38,7 +38,7 @@ export const logger = winston.createLogger({
 
 export const errorlogger = winston.createLogger({
 	level: 'error',
-	format: combine(label({ label: 'UNI-API' }), timestamp(), myFormat),
+	format: combine(label({ label: 'test-node' }), timestamp(), myFormat),
 	transports: [
 		new winston.transports.Console(),
 		// new DailyRotateFile({

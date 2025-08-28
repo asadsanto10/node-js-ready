@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 
 import amqplib from 'amqplib';
 import httpStatus from 'http-status';
-
+import fs from 'node:fs';
 const router = express.Router();
 
 router.get('/health', (_req, res) => {
@@ -105,6 +105,22 @@ router.post('/mqtt/auth', async (req: Request, res: Response) => {
 		}
 	);
 	// res.status(200).json({ result: 'deny' });
+});
+
+router.get('/file', async (req: Request, res: Response) => {
+	const readFileStream = fs.createReadStream('test-file.txt');
+	res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+	// readFileStream.pipe(res);
+
+	readFileStream.on('error', (err) => {
+		console.error('Stream error:', err);
+		res.status(500).end('Server error');
+	});
+
+	// const read = fs.readFileSync('test-file.txt');
+	// // res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+	// res.end(read);
+	res.json('0k');
 });
 
 // not found route

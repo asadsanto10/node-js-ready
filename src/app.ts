@@ -38,6 +38,20 @@ server = app.listen(port, () => {
 	logger.info(`Listening on port ${port}`);
 });
 
+// setInterval(() => {
+// 	const memoryUsage = process.memoryUsage();
+// 	const cpuUsage = process.cpuUsage();
+
+// 	console.log('=== Resource Usage ===');
+// 	console.log(`RSS: ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`);
+// 	console.log(`Heap Used: ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+// 	console.log(`Heap Total: ${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`);
+// 	console.log(`External: ${(memoryUsage.external / 1024 / 1024).toFixed(2)} MB`);
+// 	console.log(`CPU User: ${cpuUsage.user / 1000} ms`);
+// 	console.log(`CPU System: ${cpuUsage.system / 1000} ms`);
+// 	console.log('=====================');
+// }, 3000);
+
 unhandledRejection(server);
 
 export default app;

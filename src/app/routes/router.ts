@@ -1,12 +1,15 @@
 import express, { NextFunction, Request, Response } from 'express';
+import os from 'node:os';
 
 import amqplib from 'amqplib';
 import httpStatus from 'http-status';
 import fs from 'node:fs';
 const router = express.Router();
-
+const hostname = os.hostname();
 router.get('/health', (_req, res) => {
-	res.json({ message: 'All ok' });
+	res.json({ message: 'All ok', process: process.pid, hostname });
+	console.log('Process PID:', process.pid);
+	console.log('The machine hostname is:', hostname);
 });
 
 const queue = 'product_inventory';

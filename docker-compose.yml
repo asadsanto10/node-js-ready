@@ -1,36 +1,97 @@
+# version: '3.8'
+
+# services:
+#   emqx:
+#     image: emqx/emqx:latest
+#     container_name: emqx-2
+#     restart: always
+#     ports:
+#       - '1883:1883' # MQTT
+#       - '8083:8083' # MQTT over WebSocket
+#       - '8081:8081' # HTTP API
+#       - '18083:18083' # Dashboard
+#     environment:
+#       - EMQX_NAME=emqx
+#       - EMQX_NODE__NAME=emqx@127.0.0.1
+#       - EMQX_ALLOW_ANONYMOUS=true
+#       - EMQX_LISTENER__TCP__EXTERNAL=1883
+#       - EMQX_DASHBOARD__DEFAULT_USER__PASSWORD=public
+
+#       # Enable persistence (Mnesia DB)
+#       - EMQX_PERSISTENCE__ENABLE=true
+#       - EMQX_SESSION__EXPIRY_INTERVAL=1d # Keep sessions for 1 day
+#       - EMQX_MQTT__MAX_INFLIGHT=32
+#       - EMQX_MQTT__MAX_QUEUED_MESSAGES=1000 # Queue size per client
+#       - EMQX_MQTT__RETAIN_AVAILABLE=true
+#       - EMQX_MQTT__QOS0_QUEUE=0 # Do not queue QoS 0
+#       - EMQX_MQTT__QOS1_QUEUE=1000
+#       - EMQX_MQTT__QOS2_QUEUE=1000
+
+#     volumes:
+#       - emqx_data:/opt/emqx/data
+#       - emqx_log:/opt/emqx/log
+
+# volumes:
+#   emqx_data:
+#   emqx_log:
+
+# version: '3'
+# services:
+#   app:
+#     build: .
+#     ports:
+#       - '3000'
+#     deploy:
+#       replicas: 2
+#     restart: always
+
+# version: '3.8'
+
+# services:
+#   app:
+#     build: .
+#     expose:
+#       - '3000'
+#     restart: always
+#     # deploy:
+#     #   replicas: 3
+
+#   nginx:
+#     image: nginx:latest
+#     ports:
+#       - '3000:80'
+#     volumes:
+#       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+#     depends_on:
+#       - app
+
 version: '3.8'
 
 services:
-  emqx:
-    image: emqx/emqx:latest
-    container_name: emqx-2
-    restart: always
-    ports:
-      - '1883:1883' # MQTT
-      - '8083:8083' # MQTT over WebSocket
-      - '8081:8081' # HTTP API
-      - '18083:18083' # Dashboard
+  node-app:
+    build: .
     environment:
-      - EMQX_NAME=emqx
-      - EMQX_NODE__NAME=emqx@127.0.0.1
-      - EMQX_ALLOW_ANONYMOUS=true
-      - EMQX_LISTENER__TCP__EXTERNAL=1883
-      - EMQX_DASHBOARD__DEFAULT_USER__PASSWORD=public
+      - NODE_ENV=production
+      - PORT=3000
+    restart: always
+    # deploy:
+    #   replicas: 5
+    networks:
+      - app-network
 
-      # Enable persistence (Mnesia DB)
-      - EMQX_PERSISTENCE__ENABLE=true
-      - EMQX_SESSION__EXPIRY_INTERVAL=1d # Keep sessions for 1 day
-      - EMQX_MQTT__MAX_INFLIGHT=32
-      - EMQX_MQTT__MAX_QUEUED_MESSAGES=1000 # Queue size per client
-      - EMQX_MQTT__RETAIN_AVAILABLE=true
-      - EMQX_MQTT__QOS0_QUEUE=0 # Do not queue QoS 0
-      - EMQX_MQTT__QOS1_QUEUE=1000
-      - EMQX_MQTT__QOS2_QUEUE=1000
-
+  nginx:
+    image: nginx:latest
+    ports:
+      - '5001:80'
     volumes:
-      - emqx_data:/opt/emqx/data
-      - emqx_log:/opt/emqx/log
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./static:/usr/share/nginx/html
+    depends_on:
+      - node-app
+    restart: always
+    networks:
+      - app-network
 
-volumes:
-  emqx_data:
-  emqx_log:
+networks:
+  app-network:
+    driver: bridge

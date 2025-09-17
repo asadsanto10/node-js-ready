@@ -1,8 +1,16 @@
+<<<<<<< Updated upstream
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // import * as grpc from '@grpc/grpc-js';
 // import * as protoLoader from '@grpc/proto-loader';
 // import path from 'path';
 // import { ProtoGrpcType } from './proto/customer/customer';
+=======
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import path from 'path';
+import { ProtoGrpcType } from './proto/customer/customer';
+>>>>>>> Stashed changes
 
 // const customerProtoPath = path.join(__dirname, 'proto', 'customer', 'customer.proto');
 // const packageDefinition = protoLoader.loadSync(customerProtoPath, {
@@ -14,6 +22,7 @@
 // 	oneofs: true,
 // });
 
+<<<<<<< Updated upstream
 // export const grpcServer = (): void => {
 // 	const customerProto = grpc.loadPackageDefinition(
 // 		packageDefinition
@@ -21,3 +30,12 @@
 // 	const server = new grpc.Server();
 // 	server.addService((customerProto as any).UserService.service, {});
 // };
+=======
+export const grpcServer = (): void => {
+	const customerProto = grpc.loadPackageDefinition(
+		packageDefinition
+	) as unknown as grpc.ServiceDefinition<ProtoGrpcType>;
+	const server = new grpc.Server();
+	server.addService((customerProto as any).UserService.service, {});
+};
+>>>>>>> Stashed changes

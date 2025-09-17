@@ -2,10 +2,10 @@ import cors from 'cors';
 import express, { Application } from 'express';
 
 import cookieParser from 'cookie-parser';
-import { Server } from 'http';
+import http, { Server } from 'http';
+import path from 'node:path';
+import SocketIO from 'socket.io';
 import router from './app/routes/router';
-
-import { connectMqttClient } from './mqtt/mqttClient';
 import { uncaughtException, unhandledRejection } from './rejectionHandel/rejectionHandel';
 import { logger } from './shared/logger';
 
@@ -23,6 +23,7 @@ app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.resolve('./static')));
 // app.use(
 // 	fileUpload({
 // 		limits: { fileSize: 50 * 1024 * 1024 },
@@ -32,9 +33,37 @@ app.use(express.urlencoded({ extended: true }));
 // route
 const base = '/api/v1';
 app.use(base, router);
-connectMqttClient();
+// connectMqttClient();
 
-server = app.listen(port, () => {
+server = http.createServer(app);
+
+const io = new SocketIO.Server(server);
+const users = new Map();
+
+app.get('/users', (req, res) => {
+	return res.json(Array.from(users));
+});
+
+io.on('connection', (socket) => {
+	console.log(`user connected: ${socket.id}`);
+	users.set(socket.id, socket.id);
+
+	socket.on('outgoing:call', (data) => {
+		const { fromOffer, to } = data;
+		socket.to(to).emit('incomming:call', { from: socket.id, offer: fromOffer });
+	});
+
+	socket.on('call:accepted', (data) => {
+		const { answere, to } = data;
+		socket.to(to).emit('incomming:answere', { from: socket.id, offer: answere });
+	});
+
+	socket.on('disconnect', () => {
+		console.log(`user disconnected: ${socket.id}`);
+		users.delete(socket.id);
+	});
+});
+server.listen(port, () => {
 	logger.info(`Listening on port ${port}`);
 });
 
